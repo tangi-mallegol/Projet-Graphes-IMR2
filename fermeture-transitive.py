@@ -11,7 +11,6 @@ class Liaison:
 
 class Noeud:
 
-
 	def __init__(self, lst_noeud, number):
 		#Alimentation des variables de l'instance
 		self.name = number
@@ -28,10 +27,14 @@ class Noeud:
 		if(already_there == False):		
 			self.lst_noeud.append(Liaison(noeud,poids))
 
+	def add_noeuds(self, lst_noeuds):
+		for x in lst_noeuds:
+			self.add_noeud(x.noeud,x.poids)
+
 	def has_noeud(self,noeud):
 		for noeud_boucle in self.lst_noeud:
-			print noeud_boucle.__class__.__name__
-			print noeud.__class__.__name__
+			#print noeud_boucle.__class__.__name__
+			#print noeud.__class__.__name__
 			if noeud_boucle.noeud == noeud:
 				return True
 		return False
@@ -39,7 +42,7 @@ class Noeud:
 	def get_noeud(self,index):
 		return self.lst_noeud[index]
 
-	#La méthode get_liaison retourne false si il n'y a pas de laison sinon elle retourne la liaison
+	#La méthode get_liaison retourne false si il n'y a pas de liaison sinon elle retourne la liaison
 	def get_liaison(self, noeud):
 		for noeud_boucle in self.lst_noeud:
 			if noeud_boucle.noeud == noeud:
@@ -54,10 +57,6 @@ class Noeud:
 		s = s[:-1] + "}"
 		print s
 
-	def add_noeuds(self, lst_noeuds):
-		for x in lst_noeuds:
-			self.add_noeud(x.noeud,x.poids)
-
 	def sort(self):
 		self.lst_noeud.sort(key=lambda noeud: noeud.noeud.name)
 
@@ -66,6 +65,13 @@ class Graphe:
 	def __init__(self,name, lst_noeud):
 		self.name = name
 		self.lst_noeud = lst_noeud
+
+	def get_noeuds_precedent(self,noeud):
+		lst_noeud_precedent = []
+		for noeud_precedent_potentiel in self.lst_noeud:
+			if arc(noeud_precedent_potentiel,noeud):
+				lst_noeud_precedent.append(noeud_precedent_potentiel)
+		return lst_noeud_precedent
 
 	def arc(self,i,j):
 		return i.has_noeud(j)
@@ -134,12 +140,10 @@ def WARSHALL(graphe):
 	nb_noeud_add = 0
 	for i in graphe_.lst_noeud:
 		lst_noeuds = []
-		for j in i.lst_noeud:
-			for k in j.noeud.lst_noeud:
-				new_liaison = Liaison.cp_liaison(k)
-				new_liaison.poids = j.poids + k.poids
-				lst_noeuds.append(new_liaison)
-		i.add_noeuds(lst_noeuds)
+		for j in graphe_.lst_noeud:
+			for k in graphe_.lst_noeud:
+				if(graphe_.arc(j,i) and graphe_.arc(i,k)):	
+					j.add_noeud(k,1)
 	return graphe_
 
 #DIJKSTRA
