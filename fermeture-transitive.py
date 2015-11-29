@@ -216,7 +216,7 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 
 	#Début algorithme
 
-	
+	#tant qu'il y a reste des chemins à calculer
 	while len(lst_noeuds_restants):
 		#On calcule le point le plus près
 		chemin_min = float('inf')
@@ -229,6 +229,7 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 				#est inférieur au poid minimum trouvé pour l'instant
 				result1 = graphe.arc(noeud_utilise["noeud"] , noeud_restant["noeud"])
 				if graphe.arc(noeud_utilise["noeud"] , noeud_restant["noeud"]) and noeud_utilise["noeud"].get_liaison(noeud_restant["noeud"]).poids + noeud_utilise["poids"] < chemin_min:
+					#print noeud_restant["noeud"].name
 					chemin_min = noeud_utilise["noeud"].get_liaison(noeud_restant["noeud"]).poids
 					noeud_min = noeud_restant
 					noeud_min_pere = noeud_utilise
@@ -238,9 +239,12 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 		#On met le bon poids ainsi que le bon chemin
 		noeud_min["poids"] = noeud_min_pere["poids"] + noeud_min_pere["noeud"].get_liaison(noeud_min["noeud"]).poids
 		chemin = noeud_min_pere["chemin"]
+		for noeud in noeud_min["chemin"]:
+			print noeud.name
 		chemin.append(noeud_min["noeud"])
 		for noeud in chemin:
 			print noeud.name
+		print "---"
 		noeud_min["chemin"] = chemin
 		#On ajoute le chemin aux chemins traités
 		lst_noeuds_utilises.append(noeud_min)
@@ -370,6 +374,8 @@ def init_4():
 
 	noeud_1.add_noeud_oriente(noeud_2,3)
 	noeud_2.add_noeud_oriente(noeud_3,5)
+	noeud_3.add_noeud_oriente(noeud_2,4)
+	noeud_4.add_noeud_oriente(noeud_5,1)
 	noeud_2.add_noeud_oriente(noeud_5,6)
 	noeud_3.add_noeud_oriente(noeud_4,7)
 	noeud_4.add_noeud_oriente(noeud_2,4)
