@@ -3,7 +3,10 @@ class Liaison:
 
 	def __init__(self,noeud,poids):
 		self.noeud = noeud
-		self.poids = poids
+		if poids < 0:
+			self.poids = - poids
+		else:
+			self.poids = poids
 
 	@staticmethod
 	def cp_liaison(liaison):
@@ -190,16 +193,6 @@ def WARSHALL(graphe):
 #	faire
 #fin
 
-
-#paramètre de type { "noeud" : noeud, "poids" : poids, "chemin" : [A,B,C] }
-def printCheminLePlusCourt(chemin_le_plus_cours):
-	print "Noeud : " + chemin_le_plus_cours["noeud"].name
-	print "Poids du chemin : " + str(chemin_le_plus_cours["poids"])
-	string_chemin = ""
-	for noeud in chemin_le_plus_cours["chemin"]:
-		string_chemin += " " + noeud.name
-	print "Chemin : " + string_chemin
-
 def Dijkstra(graphe, noeud_start, noeud_end):
 	#Nous allons représenter les noeuds sous forme d'un tableau à 3 dimensions
 	# 1 : Le noeud
@@ -211,8 +204,8 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 	lst_noeuds_restants = []
 	for noeud in graphe.lst_noeud:
 		if noeud != noeud_start:
-			lst_noeuds_restants.append({"noeud" : noeud , "poids" : float('inf') , "chemin" : [] })
-	lst_noeuds_utilises.append({ "noeud" : noeud_start, "poids" : 0 , "chemin" : [noeud_start]})
+			lst_noeuds_restants.append({"noeud" : noeud , "poids" : float('inf')})
+	lst_noeuds_utilises.append({ "noeud" : noeud_start, "poids" : 0})
 
 	#Début algorithme
 
@@ -227,7 +220,6 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 			for noeud_restant in lst_noeuds_restants:
 				#Si un arc existe et que (son poids + celui du chemin pour aller jusqu'au noeud_utilise)
 				#est inférieur au poid minimum trouvé pour l'instant
-				result1 = graphe.arc(noeud_utilise["noeud"] , noeud_restant["noeud"])
 				if graphe.arc(noeud_utilise["noeud"] , noeud_restant["noeud"]) and noeud_utilise["noeud"].get_liaison(noeud_restant["noeud"]).poids + noeud_utilise["poids"] < chemin_min:
 					#print noeud_restant["noeud"].name
 					chemin_min = noeud_utilise["noeud"].get_liaison(noeud_restant["noeud"]).poids
@@ -235,24 +227,22 @@ def Dijkstra(graphe, noeud_start, noeud_end):
 					noeud_min_pere = noeud_utilise
 
 		#On enlève le noeud des noeuds restants à explorer
-		lst_noeuds_restants.remove(noeud_min)
-		#On met le bon poids ainsi que le bon chemin
-		noeud_min["poids"] = noeud_min_pere["poids"] + noeud_min_pere["noeud"].get_liaison(noeud_min["noeud"]).poids
-		chemin = noeud_min_pere["chemin"]
-		for noeud in noeud_min["chemin"]:
-			print noeud.name
-		chemin.append(noeud_min["noeud"])
-		for noeud in chemin:
-			print noeud.name
-		print "---"
-		noeud_min["chemin"] = chemin
-		#On ajoute le chemin aux chemins traités
-		lst_noeuds_utilises.append(noeud_min)
+		if noeud_min != None:
+			lst_noeuds_restants.remove(noeud_min)
+			#On met le bon poids ainsi que le bon chemin
+			noeud_min["poids"] = noeud_min_pere["poids"] + noeud_min_pere["noeud"].get_liaison(noeud_min["noeud"]).poids
+			#On ajoute le chemin aux chemins traités
+			lst_noeuds_utilises.append(noeud_min)
+		if noeud_min == None:
+			#On a des noeuds dans la liste des noeuds restant mais aucun ne peut être contacter via le noeud de départ
+			for noeud_restant in lst_noeuds_restants:
+				lst_noeuds_restants.remove(noeud_restant)
 
 	#On a traité tous les chemins
 	for noeud in lst_noeuds_utilises:
 		if noeud["noeud"] == noeud_end:
 			return noeud
+
 
 '''
 	lst_noeuds_restants = graphe_.lst_noeud
@@ -386,9 +376,57 @@ def init_4():
 	lst_noeud.append(noeud_4)
 	lst_noeud.append(noeud_5)
 
-	return Graphe("Graphe 3", lst_noeud)
+	return Graphe("Graphe 4", lst_noeud)
 
+def init_4():
+	lst_noeud = []
 
+	noeud_1 = Noeud([],"A")
+	noeud_2 = Noeud([],"B")
+	noeud_3 = Noeud([],"C")
+	noeud_4 = Noeud([],"D")
+	noeud_5 = Noeud([],"E")
+
+	noeud_1.add_noeud_oriente(noeud_2,3)
+	noeud_2.add_noeud_oriente(noeud_3,5)
+	noeud_3.add_noeud_oriente(noeud_2,4)
+	noeud_4.add_noeud_oriente(noeud_5,1)
+	noeud_2.add_noeud_oriente(noeud_5,6)
+	noeud_3.add_noeud_oriente(noeud_4,7)
+	noeud_4.add_noeud_oriente(noeud_2,4)
+
+	lst_noeud.append(noeud_1)
+	lst_noeud.append(noeud_2)
+	lst_noeud.append(noeud_3)
+	lst_noeud.append(noeud_4)
+	lst_noeud.append(noeud_5)
+
+	return Graphe("Graphe 4", lst_noeud)
+
+def init_5():
+	lst_noeud = []
+
+	noeud_1 = Noeud([],"A")
+	noeud_2 = Noeud([],"B")
+	noeud_3 = Noeud([],"C")
+	noeud_4 = Noeud([],"D")
+	noeud_5 = Noeud([],"E")
+
+	noeud_1.add_noeud_oriente(noeud_2,3)
+	noeud_2.add_noeud_oriente(noeud_3,5)
+	noeud_3.add_noeud_oriente(noeud_2,5)
+	noeud_4.add_noeud_oriente(noeud_5,1)
+	noeud_2.add_noeud_oriente(noeud_5,12)
+	noeud_3.add_noeud_oriente(noeud_4,2)
+	noeud_4.add_noeud_oriente(noeud_2,4)
+
+	lst_noeud.append(noeud_1)
+	lst_noeud.append(noeud_2)
+	lst_noeud.append(noeud_3)
+	lst_noeud.append(noeud_4)
+	lst_noeud.append(noeud_5)
+
+	return Graphe("Graphe 4", lst_noeud)
 
 graphe = init_1()
 graphe.print_graphe()
@@ -398,7 +436,7 @@ graphe_ = WARSHALL(graphe)
 print "-------   WARSHALL FINI   -------"
 graphe_.print_graphe()
 graphe_.print_matrice_liaison_poids()
-
+print "-------   NOUVEAU TEST    -------"
 
 graphe = init_2()
 graphe.print_graphe()
@@ -408,7 +446,7 @@ graphe_ = WARSHALL(graphe)
 print "-------   WARSHALL FINI   -------"
 graphe_.print_graphe()
 graphe_.print_matrice_liaison_poids()
-
+print "-------   NOUVEAU TEST    -------"
 
 graphe = init_3()
 graphe.print_graphe()
@@ -418,7 +456,7 @@ graphe_ = WARSHALL(graphe)
 print "-------   WARSHALL FINI   -------"
 graphe_.print_graphe()
 graphe_.print_matrice_liaison_poids()
-
+print "-------   NOUVEAU TEST    -------"
 
 graphe = init_4()
 graphe.print_graphe()
@@ -426,4 +464,13 @@ graphe.print_matrice_liaison_poids()
 print "------- DIJKSTRA EN COURS -------"
 chemin_le_plus_cours = Dijkstra(graphe, graphe.lst_noeud[0], graphe.lst_noeud[4])
 print "-------   DIJKSTRA FINI   -------"
-printCheminLePlusCourt(chemin_le_plus_cours)
+print "Poids du chemin le plus cours : " + str(chemin_le_plus_cours["poids"])
+print "-------   NOUVEAU TEST    -------"
+
+graphe = init_5()
+graphe.print_graphe()
+graphe.print_matrice_liaison_poids()
+print "------- DIJKSTRA EN COURS -------"
+chemin_le_plus_cours = Dijkstra(graphe, graphe.lst_noeud[1], graphe.lst_noeud[3])
+print "-------   DIJKSTRA FINI   -------"
+print "Poids du chemin le plus cours : " + str(chemin_le_plus_cours["poids"])
